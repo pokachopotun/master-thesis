@@ -16,35 +16,39 @@
 \newfontfamily{\cyrillicfont}{Times New Roman}
 \newfontfamily{\cyrillicfonttt}{Times New Roman}
 
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
 %\usepackage[utf8]{inputenc}
-%\usepackage[russian,english]{babel}
+%\usepackage[russian]{babel}
 
 \usepackage{lipsum}
-\usepackage[margin=2cm,left=3cm,right=1cm,includefoot]{geometry}
+\usepackage[margin=2cm,left=3cm,right=15mm,includefoot]{geometry}
 
+\renewcommand{\thesection}{\arabic{section}}
 
 \begin{document}
 \begin{titlepage}
-    \begin{center}
+        \begin{center}
 
-    \bigskip
+        \bigskip
 
-    \uppercase{Московский государственный университет им. М.В. Ломоносова} \\
+        \uppercase{Московский государственный университет им. М.В. Ломоносова} \\
 
-    \bigskip
+        \bigskip
 
-    \includegraphics[width=50mm]{msu.eps}
+        \includegraphics[width=50mm]{msu.eps}
 
-    \bigskip
-    \uppercase{Факультет вычислительной математики и кибернетики} \\
-    \uppercase{Кафедра суперкомпьютеров и квантовой информатики} \\
-    \bigskip
-    \uppercase{\Huge\bfseries Магистерская диссертация} \\
-    {\large на тему:} \\
-    \uppercase{\large\bfseries Алгоритмы поиска подграфов типа "черная дыра" в ориентированном графе}
+        \bigskip
+        \uppercase{Факультет вычислительной математики и кибернетики} \\
+        \uppercase{Кафедра суперкомпьютеров и квантовой информатики} \\
+        \bigskip
+        \uppercase{\Huge\bfseries Магистерская диссертация} \\
+        {\large на тему:} \\
+        \uppercase{\large\bfseries Алгоритмы поиска подграфов типа "черная дыра" в ориентированном графе}
 
-    \bigskip
-    Шифр и наименование специальности
+        \bigskip
+        Шифр и наименование специальности
 
     \end{center}
 
@@ -70,5 +74,11 @@
     \end{center}
 
 \end{titlepage}
+
+\tableofcontents
+
+\cleardoublepage
+
+\section{Введение}\label{sec:otherintro}
 
 \end{document}
