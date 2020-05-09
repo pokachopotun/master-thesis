@@ -230,7 +230,10 @@
 \end{definition}
 
 \begin{definition}
-Пусть дан ориентированный граф $G(V,E)$, корень $r \in Roots(G),\ topSortOrder_r$ --- топологическая сортировка замыкания $Closure(r)$ и $|Closure(v)|$ --- размеры замыканий для всех вершин $v \in Closure(r)$, то есть доступных из $r$. Вершина называется особой вершиной под корнем $r$, если размер ее замыкания $|Closure(v)|$ равен ее индексу в массиве $topSortOrder_r$ плюс один.
+Пусть дан ориентированный граф $G(V,E)$, корень $r \in Roots(G)$, $topSortOrder_r$ ---
+топологическая сортировка замыкания $Closure(r)$ и $|Closure(v)|$ ---
+размеры замыканий для всех вершин $v \in Closure(r)$, то есть доступных из $r$.
+Вершина называется особой вершиной под корнем $r$, если размер ее замыкания $|Closure(v)|$ равен ее индексу в массиве $topSortOrder_r$ плюс один.
 \end{definition}
 
 \begin{remark}
@@ -254,7 +257,9 @@
 \end{theorem}
 
 \begin{proof}
-По определению особой вершины размер замыкания $v$ равен ее индексу плюс один в $topSortOrder_r$. Рассмотрим все вершины, отличные от $v$ в замыкании $Closure(v)$. Эти вершины в массиве $topSortOrder_r$ имеют индексы меньше, чем вершина $v$. Отсюда $\forall u \in Closure(v)$ вершины $u$ будет достижима из $v$.
+По определению особой вершины размер замыкания $v$ равен ее индексу плюс один в $topSortOrder_r$.
+Рассмотрим все вершины, отличные от $v$ в замыкании $Closure(v)$.
+Эти вершины в массиве $topSortOrder_r$ имеют индексы меньше, чем вершина $v$. Отсюда $\forall u \in Closure(v)$ вершины $u$ будет достижима из $v$.
 \end{proof}
 
 \begin{theorem}
@@ -294,28 +299,90 @@
                                     }
                                 }
                             }
-                        }
-                        $C_i = P_i$  \tcp*[f]{$C_i$ -- список кандидатов} \\
-                        \ForEach{$v \in C_i$} {
-                            \If{$|Closure(v)| == i$} {
-                                $Blackholes = Blackholes \cup Closure(v)$
+                            $C_i = P_i$  \tcp*[f]{$C_i$ -- список кандидатов} \\
+                            \ForEach{$v \in C_i$} {
+                                \If{$|Closure(v)| == i$} {
+                                    $Blackholes = Blackholes \cup Closure(v)$
+                                }
+                                \If{$|Closure(v)| >= i$} {
+                                    удалить $v$ из $С_i$\\
+                                    удалить вcех предков $v$ из $С_i$ \\
+                                }
                             }
-                            \If{$|Closure(v)| >= i$} {
-                                удалить $v$ из $С_i$\\
-                                удалить вcех предков $v$ из $С_i$ \\
-                            }
-                        }
-                        \tcc{Применить алгоритм полного перебора к $C_i(i)$ -- множеству всех подмножеств $C_i$, содержащих $i$ вершин}
-                        \ForEach{$B \in C_i(i)$} {
-                            \If{$G(B)$ -- слабо связан} {
-                                \If{$d_{out}(B) == 0$} {
-                                    $Blackholes = Blackholes \cup B$ \\
+                            \tcc{Применить алгоритм полного перебора к $F_i(i)$ -- множеству всех подмножеств $F_i$, содержащих $i$ вершин}
+                            \ForEach{$B \in F_i(i)$} {
+                                \If{$G(B)$ -- слабо связан} {
+                                    \If{$d_{out}(B) == 0$} {
+                                        $Blackholes = Blackholes \cup B$ \\
+                                    }
                                 }
                             }
                         }
                         \Return $Blackholes$
 			\label{alg:iblackhole}
 			\caption{iBlackhole}
+		\end{algorithm}
+	\end{center}
+\end{figure}
+\linespread{1.5}
+
+\linespread{1.0}
+\begin{figure}[H]
+	\begin{center}
+		\begin{algorithm}[H]
+			\SetAlgoLined
+			\SetKwInOut{Input}{Input}
+			\SetKwInOut{Output}{Output}
+			\Input{$G(v, E)$ -- ориентированный граф, $V$ -- множество вершин, $E$ -- множество ребер, \\
+                   $n$ -- максимальное число вершин, которое может содержать черная дыра}
+			\Output{$Blackholes$ -- множество всех черных дыр графа размером от 1 до n}
+
+                        $Blackholes = \emptyset, C_0 = \emptyset$ \\
+                        \For{$i = 1\ to\ n$} {
+                            $P_i = \{v | d_{out}(v) < i\}$ \\
+                            убрать лишние вершины из $P_i$ и сформировать список кандидатов $C_i$ \\
+                            убрать лишние вершины из $C_i$ и сформировать список кандидатов $F_i$ \\
+                            \ForEach{$WCC \in G(F_i)$} {
+                                \tcc{Применить алгоритм полного перебора к $WCC_i(i)$ -- множеству всех подмножеств $WCC_i$, содержащих $i$ вершин}
+                                \ForEach{$B \in WCC_i(i)$} {
+                                    \If{$G(B)$ -- слабо связан} {
+                                        \If{$d_{out}(B) == 0$} {
+                                            $Blackholes = Blackholes \cup B$
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        \Return $Blackholes$
+			\label{alg:iblackholedc}
+			\caption{iBlackholeDC}
+		\end{algorithm}
+	\end{center}
+\end{figure}
+\linespread{1.5}
+
+\linespread{1.0}
+\begin{figure}[H]
+	\begin{center}
+		\begin{algorithm}[H]
+			\SetAlgoLined
+			\SetKwInOut{Input}{Input}
+			\SetKwInOut{Output}{Output}
+			\Input{$G(v, E)$ -- ориентированный граф, $V$ -- множество вершин, $E$ -- множество ребер, \\
+                   $n$ -- максимальное число вершин, которое может содержать черная дыра}
+			\Output{$Blackholes$ -- множество всех черных дыр графа размером от 1 до n}
+
+                        $Blackholes = \emptyset, C_0 = \emptyset$ \\
+                        $P_i = \{v | d_{out}(v) < n\}$ \\
+                        убрать лишние вершины из $P_n$ и сформировать список кандидатов $C_n$ \\
+                        убрать лишние вершины из $C_n$ и сформировать список кандидатов $F_n$ \\
+                        \ForEach{$WCC \in G(F_n)$} {
+                            \tcc{Применить алгоритм TopSortBH к $G(WCC_n)$}
+                            $Blackholes = Blackholes \cup TopSortBH(G(WCC_n))$
+                        }
+                        \Return $Blackholes$
+			\label{alg:topover}
+			\caption{TopOver}
 		\end{algorithm}
 	\end{center}
 \end{figure}
@@ -344,7 +411,7 @@
                         }
                         \Return $Blackholes$
 			\label{alg:topsort}
-			\caption{TopSort}
+			\caption{TopSortBH}
 		\end{algorithm}
 	\end{center}
 \end{figure}
