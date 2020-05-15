@@ -992,10 +992,192 @@ bool ShouldSkip(const vector<size_t>& tsOrder,
 \section{Результаты экспериментов}\label{sec:experimentalresults}
 
 Для сравнения разработанных алгоритмов мы провели ряд экспериментов.
+Сравнение производилось на трех типах графов RMAT, SSCA2, и UR.
+Все запуски были произведены на системе Polus, состоящей из 5 узлов.
+Характеристики узла выглядят следующим образом:
+\begin{itemize}
+\item 2 десятиядерных процессора IBM POWER8 (каждое ядро имеет 8 потоков) всего 160 потоков
+\item Общая оперативная память 256 Гбайт (в узле 5 оперативная память 1024 Гбайт) с ЕСС контролем
+\item 2 х 1 ТБ 2.5” 7K RPM SATA HDD
+\item 2 x NVIDIA Tesla P100 GPU, 16Gb, NVLink
+\item 1 порт 100 ГБ/сек
+\item Производительность кластера (Tflop/s): 55,84 (пиковая), 40,39 (Linpack)
+\end{itemize}
+
+\subsection{iBlackholeDC vs TopSortBH}\label{subsec:vanillasucks}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/1_RMAT.pdf}
+      \caption{RMAT}
+      \label{fig:vanilla:rmat}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/1_SSCA2.pdf}
+      \caption{SSCA2}
+      \label{fig:vanilla:ssca}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/1_UR.pdf}
+      \caption{UR}
+      \label{fig:vanilla:ur}
+    \end{subfigure}
+    \caption{iBlackholeDC 1 поток, и TopSortBH 8 потоков, Timeout: 30 минут.}
+    \label{fig:vanilla}
+\end{figure}
+
+Мы начали со сравнения iBlackholeDC и TopSortBH на графах небольшого размера.
+В работе \ref{li2010detecting} алгоритм iBlackholeDC уже испытывался на похожих по размеру графах.
+Теперь мы провели его сравнение с TopSortBH.
+
+iBlackholeDC запускался в один поток. Алгоритм был реализован по описанию в оригинальной статье 2010
+года и больше не изменялся.
+TopSortBH запускался в 8 потоков. Здесь проводится не равное сравнение, поскольку
+мы хотим подчеркнуть, что наш алгоритм хорошо подходит для параллельной работы, а также
+показать общие преимущество достигнутое по результатам работы.
+Оба алгоритма получали на вход граф без предобработки. Таким образом, конденсация графа,
+которая необходима алгоритму TopSortBH для корректной работы, учитывалась в общем времени его работы.
+
+На рисунке \ref{fig:vanilla:rmat} показано, что iBlackholeDC не уложился в ограничение по времени для графов масштабом больше 10.
+TopSortBH успел отработать на всех графах, кроме масштаба 12, и время его работы не превышало секунды.
+
+На рисунке \ref{fig:vanilla:ssca} видим, что iBlackholeDC показывал преимущество на графах совсем маленьких размеров, но начал проигрывать в последствии.
+Оба алгоритма переставали укладываться в отведенное время после масштаба 6 SSCA2 графа. Эти графы хуже всего поддаются любым эвристикам и сжатиям,
+в них ярче всего проявляется комбинаторная природа задачи.
+
+В случае графа UR Рис. \ref{fig:vanilla:ur} оба алгоритма уложились в отведенное время для всех представленных размеров, однако TopSortBH был быстрее во всех
+случаях. Здесь конденсация графа имеет решающее значение для времени работы алгоритма.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/1_large_RMAT.pdf}
+    \caption{iBlackholeDC 1 поток, и TopSortBH 8 потоков на графах большого размера. По оси Y найденное количество черных дыр. Timeout: 3 часа}
+    \label{fig:vanillalarge}
+\end{figure}
+
+Мы также провели сравнение производительности для RMAT графов больших размеров. Сложность подобного сравнения заключается в том,
+что такие графы обрабатываются очень долго и конечный результат может зависеть от структуры графа и заданного ограничения по времени.
+На рисунке \ref{fig:vanillalarge} показано количество найденных черных дыр за 3 часа. В правой части графики начинают сходится.
+Мы полагаем, что это особенность конкретно взятого графа и считаем, что незначительное преимущество при данном времени останова
+означает, что значительно большее число вариантов уже было просмотрено и отфильтровано.
+
+\subsection{iBlackholeDC vs TopOver}\label{subsec:topovercomparison}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/2_RMAT.pdf}
+      \caption{RMAT}
+      \label{fig:topochi:rmat}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/2_SSCA2.pdf}
+      \caption{SSCA2}
+      \label{fig:topochi:ssca}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/2_UR.pdf}
+      \caption{UR}
+      \label{fig:topochi:ur}
+    \end{subfigure}
+    \caption{iBlackholeDC 1 поток, TopOver 1 поток. Поиск черных дыр размером до 25 вершин. Timeout: 30 минут}
+    \label{fig:topochi}
+\end{figure}
+
+Переходим к сравнению алгоритма TopOver и оригинального iBlackhole.
+Эти алгоритмы сравниваем в режиме поиска черных дыр ограниченного размера.
+В качестве такого размера было выбрано число 25.
+Запуски производились на графах масштабом до 16.
+На графах RMAT рис. \ref{fig:topochi:rmat} алгоритмы показывают сравнимую производительность,
+однако при увеличении размера графа TopOver алгоритм демонстрирует ярко выраженное преимущество.
+В случае UR рис. \ref{fig:topochi:ur} графов разница между алгоритмами отсутствует.
+На графах SSCA2 рис. \ref{fig:topochi:ssca} iBlackhole не успевает отработать для масштабов больше 8, а TopOver укладывается
+в полчаса на графах масштабом до 14 включительно.
+
+\subsection{iBlacholeDC на сконденсированных графах}\label{subsec:topsortasync}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/4_RMAT.pdf}
+      \caption{RMAT}
+      \label{fig:chinesecond:rmat}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/4_SSCA2.pdf}
+      \caption{SSCA2}
+      \label{fig:chinesecond:ssca}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/4_UR.pdf}
+      \caption{UR}
+      \label{fig:chinesecond:ur}
+    \end{subfigure}
+    \caption{iBlackholeDC Кондесация 8 потоков, TopSortBH 8 потокoв, Timeout: 30 минут}
+    \label{fig:chinesecond}
+\end{figure}
+
+Логичным шагом было добавить стадию конденсации графа в iBlackholeDC и сравнить его
+многопоточный вариант с TopSortBH. Как видно на рисунке \ref{ref:chinesecond},
+при таких условиях iBlackholeDC выигрывает по времени работы у TopSortBH.
+
+\subsection{TopSortBH и большое количество потоков}\label{subsec:topsortasync}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/many_threads_RMAT.pdf}
+    \label{fig:manythreads}
+    \caption{TopSortBH до 160 потоков. Количетство просмотренных кандидатов. Timeout: 30 минут}
+\end{figure}
+
+Как уже было сказано, TopSortBH разрабатывался для использования в параллельном режиме. Поэтому
+мы начали с запуска большого количества потоков. Все запуски производились на графе RMAT масштаба 18.
+Важно отметить, что во всех конфигурациях алгоритм успел обнаружить одинаковое количество черных дыр
+и завершился через полчаса работы. Поэтому было удобно сравнивать количество рассмотренных кандидатов.
+Система Polus позволяет запускать до 160 потоков на одном узле, что позволило провести исследование
+поведения алгоритма с использованием общей памяти.
+По графику на рисунке \ref{fig:manythreads} видно, что использование 80 потоков дает 75\%
+результата, дистигнутого при использовании 160 потоков. Также на графике наблюдается
+заметный излом именно при 80 задействованных потоках.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/18_threads_RMAT.pdf}
+    \caption{TopSortBH до 20 потоков. Timeout: 30 минут}
+    \label{fig:corebinding}
+\end{figure}
+
+Также мы запустили алгоритм TopSortBH в режиме привязки каждого потока к отдельно взятому ядру.
+Polus располагает 20 ядрами на каждый узел, поэтому таким количеством потоков нам пришлось ограничиться.
+По рисунку \ref{fig:corebinding} видно, что производительность с использованием
+привязки для 20 потоков превышает результат обычного запуска на треть.
+Более того 20 потоков в режиме привязки, показывают такую же производиетельность, как при 40 потоках
+без привязки.
 
 \cleardoublepage
 \section{Заключение}\label{sec:conclusion}
+В данной работы была рассмотрена задача поиска паттерна черная дыра
+в ориентированных графах без весов.
 
+В рамках решения данной задачи был реализован предложенный ранее алгоритм iBlackhole и его модификация
+iBlackholeDC. Также был разработан и реализован новый алгоритм TopSortBH.
+Он состоит из трех главных частей: подход к обработке графа, ранее не
+использовавшийся при решении данной задачи, подход к организации перебора,
+позволяющий избегать наборов вершин, которые заведомо не являются черными дырами,
+подход к сокращению такого перебора, с целью ускорения обработки графов большого размера.
+
+В дизайне алгоритма TopSortBH заложен большой потенциал для его использования в
+массивно-параллельных системах. Это было продемонстрировано с использованием общей памяти на системе Polus.
+
+Рассмотрено и проверено на практике комбинированное использование техник TopSortBH и iBlackhole. Такой подход назван TopOver,
+и демонстрирует преимущество поиска черных дыр ограниченного размера.
 
 %
 % ---- Bibliography ----
@@ -1003,6 +1185,6 @@ bool ShouldSkip(const vector<size_t>& tsOrder,
 \newpage
 \bibliographystyle{acm}
 \bibliography{biblio}
-\addcontentsline{toc}{section}{Список литературы}
+\addcontentsline{toc}{section}{Список использованных источников}
 
 \end{document}
