@@ -1183,6 +1183,95 @@ Polus располагает 20 ядрами на каждый узел, поэ�
 Более того 20 потоков в режиме привязки, показывают такую же производиетельность, как при 40 потоках
 без привязки.
 
+\subsection{iBlackholeDC и большое количество потоков}\label{subsec:chinesemanythreads}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/5_count.pdf}
+      \caption{Обнаружено черных дыр}
+      \label{fig:chinesemany:count}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm,height=6cm]{images/5_filtered.pdf}
+      \caption{Отфильтровано кандидатов}
+      \label{fig:chinesemany:filtered}
+    \end{subfigure}
+    \caption{Алгоритм iBlackholeDC запущенный для количества потоков от 1 до 160. Число потоков отложено по оси X. Timeout: 30 минут}
+    \label{fig:chinesemany}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/6_count.pdf}
+      \caption{Обнаружено черных дыр}
+      \label{fig:chinesebinding:count}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm,height=6cm]{images/6_filtered.pdf}
+      \caption{Отфильтровано кандидатов}
+      \label{fig:chinesebinding:filtered}
+    \end{subfigure}
+    \caption{Алгоритм iBlackholeDC запущенный для количества потоков от 1 до 20 с использованием привязки потоков к ядру. Число потоков отложено по оси X. Timeout: 30 минут}
+    \label{fig:chinesebinding}
+\end{figure}
+
+\subsection{Эвристика FastSkip}\label{subsec:fastskipexperiment}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/7_count_RMAT.pdf}
+      \caption{Обнаружено черных дыр}
+      \label{fig:fastskiprmat:count}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm,height=6cm]{images/7_filtered_RMAT.pdf}
+      \caption{Отфильтровано кандидатов}
+      \label{fig:fastskiprmat:filtered}
+    \end{subfigure}
+    \caption{Алгоритм TopOver запущенный в 1 потоке с использованием подификации FastSkip. По оси X отложен масштаб графа. Timeout: 30 минут}
+    \label{fig:fastskiprmat}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/7_count_SSCA2.pdf}
+      \caption{Обнаружено черных дыр}
+      \label{fig:fastskipssca:count}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm,height=6cm]{images/7_filtered_SSCA2.pdf}
+      \caption{Отфильтровано кандидатов}
+      \label{fig:fastskipssca:filtered}
+    \end{subfigure}
+    \caption{Алгоритм TopOver запущенный в 1 потоке с использованием подификации FastSkip. По оси X отложен масштаб графа. Timeout: 30 минут}
+    \label{fig:fastskipssca}
+\end{figure}
+
+\begin{figure}[H]
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/8_count.pdf}
+      \caption{Обнаружено черных дыр}
+      \label{fig:fastskipmanythreads:count}
+    \end{subfigure}
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \includegraphics[width=8cm]{images/8_filtered.pdf}
+      \caption{Отфильтровано кандидатов}
+      \label{fig:fastskipmanythreads:filtered}
+    \end{subfigure}
+    \caption{Алгоритм TopSort запущенный c использованием подификации FastSkip. Число потоков от 1 до 140. Граф RMAT масштаба 18. По оси X отложено количество потоков. Timeout: 30 минут}
+    \label{fig:fastskipmanythreads}
+\end{figure}
+
 \cleardoublepage
 \section{Заключение}\label{sec:conclusion}
 В данной работы была рассмотрена задача поиска паттерна черная дыра
