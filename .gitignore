@@ -5,4 +5,5 @@
 *.fls
 *.toc
 *.aux
+*.out
 *.fdb_latexmk
