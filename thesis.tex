@@ -202,7 +202,7 @@ Hong \cite{hong2015detecting} рассматривает задачу поиск
 Введем несколько дополнительных определений.
 
 \begin{definition}\label{def:orpath}
-	Пусть дан ориентированный граф $G(V,E)$. Последовательность $v_0v_1v_2...v_k$, состоящая из вершин $v_i \in V,\ 0 \leq i \leq k$ образует ориентированный путь из $v_0$ в $v_k$, если существуют ребра $(v_{i-1}, v_i) \in E,\ 1 \leq i \leq k$ и $v_i \neq v_j$ для всех $0 \leq i,\ j \leq k,\ i \neq j$. Длина такого ориентированного пути равна $k$.
+	Пусть дан ориентированный граф $G(V,E)$. Последовательность \\ $v_0v_1v_2...v_k$, состоящая из вершин $v_i \in V,\ 0 \leq i \leq k$ образует ориентированный путь из $v_0$ в $v_k$, если существуют ребра $(v_{i-1}, v_i) \in E,\ 1 \leq i \leq k$ и $v_i \neq v_j$ для всех $0 \leq i,\ j \leq k,\ i \neq j$. Длина такого ориентированного пути равна $k$.
 \end{definition}
 
 \begin{definition}\label{def:reachablevertex}
@@ -1010,12 +1010,16 @@ set<size_t> GetBlackHole(const TGraph& graph,
 \end{lstlisting}
 
 \begin{lstlisting}[language=C++, caption=Обход замыкания данной вершины, label=code:getclosure]
-TClosure GetClosure(const TGraph& g, size_t v, TUsed& used) {
+TClosure GetClosure(const TGraph& g,
+                    size_t v,
+                    TUsed& used)
+{
     return ClosureBFS(g, used, v);
 }
 
 TClosure ClosureBFS(const TGraph& g,
-                    TUsed& used, size_t s)
+                    TUsed& used,
+                    size_t s)
 {
     TUsed localUsed(used.size(), 0);
     queue<size_t> q;
@@ -1081,7 +1085,10 @@ bool ShouldSkip(const vector<size_t>& tsOrder,
 \subsection{Модификация SkipPrecise}\label{subsec:preciseskip}
 
 \begin{lstlisting}[language=C++, caption=Пропуск сразу нескольких наборов кандидатов без ложно-отрицательных результатов, label=code:preciseskip]
-void ForceSkipPrecise(const vector<size_t>& tsOrder, const vector<char>& special, std::vector<size_t>& pos) {
+void ForceSkipPrecise(const vector<size_t>& tsOrder,
+                      const vector<char>& special,
+                      vector<size_t>& pos)
+{
     size_t skip = 0;
     for (size_t i = 1; i < pos.size(); i++) {
         size_t p = pos[i];
@@ -1091,12 +1098,12 @@ void ForceSkipPrecise(const vector<size_t>& tsOrder, const vector<char>& special
             break;
         }
     }
+    for (size_t i = skip + 1; i < pos.size(); i++) {
+	pos[i] = tsOrder.size() - pos.size() + i;
+    }
 }
 \end{lstlisting}
 
-%    for (size_t i = skip + 1; i < pos.size(); i++) {
-%	pos[i] = tsOrder.size() - pos.size() + i;
-%}
 
 
 Пусть дан массив $pos$, который содержит в себе особую вершину на некоторой позиции $skip \neq 0$.
@@ -1113,7 +1120,10 @@ void ForceSkipPrecise(const vector<size_t>& tsOrder, const vector<char>& special
 \subsection{Модификация SkipFast}\label{subsec:fastskip}
 
 \begin{lstlisting}[language=C++, caption=Пропуск большого числа кандидатов. Допускаются ложно-отрицательные результаты., label=code:fastskip]
-void ForceSkipFast(const vector<size_t>& tsOrder, const vector<char>& special, std::vector<size_t>& pos) {
+void ForceSkipFast(const vector<size_t>& tsOrder,
+                   const vector<char>& special,
+                   vector<size_t>& pos)
+{
     size_t skip = 0;
     for (size_t i = 1; i < pos.size(); i++) {
         size_t p = pos[i];
@@ -1124,13 +1134,12 @@ void ForceSkipFast(const vector<size_t>& tsOrder, const vector<char>& special, s
         }
     }
     size_t skipPos = pos[skip];
+    pos[0] = skipPos - 1;
+    for (size_t i = 1; i < pos.size(); i++) {
+	pos[i] = tsOrder.size() - pos.size() + i;
     }
 }
 \end{lstlisting}
-
-%    pos[0] = skipPos - 1;
-%for (size_t i = 1; i < pos.size(); i++) {
-%	pos[i] = tsOrder.size() - pos.size() + i;
 
 В силу комбинаторной природы задачи, рассмотрение всех черных дыр некоторого графа может
 потребовать больших временных ресурсов. В ситуации, когда необходимо быстро обнаружить
@@ -1309,7 +1318,7 @@ TopSortBH успел отработать на всех графах, кроме
         \includegraphics[width=8cm]{images/many_threads_RMAT_speedup.pdf}
         \caption{Ускорение}
         \label{subfig:manythreads:speedup}
-    \end{subfigure}[H]
+    \end{subfigure}
     \caption{TopSortBH запущенный с использованием от 1 до 160 потоков.
 По оси X отложено число потоков, по оси Y -- количество просмотренных кандидатов. Timeout: 30 минут.}
     \label{fig:manythreads}
@@ -1544,7 +1553,7 @@ iBlackholeDC. Для него разработана параллельная р
 подход к сокращению такого перебора, с целью ускорения обработки графов большого размера.
 В процессе разработки алгоритма доказано 2 теоремы об особенностях строения черных дыр.
 
-В дизайне алгоритма TopSortBH заложен потенциал для его использования в
+В дизайне алгоритма TopSortBH заложен потенциал для его использования в \\
 массивно-параллельных системах. Это было продемонстрировано с использованием общей памяти на вычислительной системе Polus.
 При использовании 160 OpenMP-потоков, просмотр кандидатов становится до 40 раз быстрее.
 При использовании привязки потоков к ядрам процессора, 20 потоков демонстрируют 8 кратный прирост производительности.
@@ -1554,7 +1563,8 @@ iBlackholeDC. Для него разработана параллельная р
 При использовании 140 потоков за 30 минут работы данная модификация алгоритма успевает найти более 3 миллионов черных дыр на графе RMAT с $2^{18}$ вершин и
 отфильтровать дополнительно 100 тысяч кандидатов. iBlackholeDC при тех же условиях обнаружит лишь 12.5 тысяч черных дыр и отклонит 2.2 миллиона кандидатов.
 
-Рассмотрено и проверено на практике комбинированное использование техник TopSortBH и iBlackholeDC. Такой подход назван TopOver, он демонстрирует преимущество в задаче поиска черных ограниченного размера.
+Рассмотрено и проверено на практике комбинированное использование техник \\ TopSortBH и iBlackholeDC.
+Такой подход назван TopOver, он демонстрирует преимущество в задаче поиска черных ограниченного размера.
 В частности, в задаче поиска черных дыр размером до 25 на графах SSCA2 TopOver успевает
 завершить работу для всех масштабов до 14 включительно ($2^{14}$ вершин), в то время как iBlackholeDC успевает отработать для масштабов 8 и меньше.
 
