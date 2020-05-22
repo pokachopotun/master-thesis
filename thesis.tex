@@ -1052,13 +1052,11 @@ void ForceSkipPrecise(const vector<size_t>& tsOrder,
             break;
         }
     }
+	for (size_t i = skip + 1; i < 		pos.size(); i++) {
+	     pos[i] = tsOrder.size() - pos.size() + i;
+}
 }
 \end{lstlisting}
-
-%    for (size_t i = skip + 1; i < pos.size(); i++) {
-%	pos[i] = tsOrder.size() - pos.size() + i;
-%}
-
 
 Пусть дан массив $pos$, который содержит в себе особую вершину на некоторой позиции $skip \neq 0$.
 Как было сказано в предыдущем пункте, такой массив $pos$ будет иметь в себе избыточные элементы, а
@@ -1089,12 +1087,12 @@ void ForceSkipFast(const vector<size_t>& tsOrder,
     }
     size_t skipPos = pos[skip];
     }
+    pos[0] = skipPos - 1;
+    for (size_t i = 1; i < pos.size(); i++) {
+    pos[i] = tsOrder.size() - pos.size() + i;
 }
 \end{lstlisting}
 
-%    pos[0] = skipPos - 1;
-%for (size_t i = 1; i < pos.size(); i++) {
-%	pos[i] = tsOrder.size() - pos.size() + i;
 
 В силу комбинаторной природы задачи, рассмотрение всех черных дыр некоторого графа может
 потребовать больших временных ресурсов. В ситуации, когда необходимо быстро обнаружить
