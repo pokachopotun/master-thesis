@@ -1052,9 +1052,9 @@ void ForceSkipPrecise(const vector<size_t>& tsOrder,
             break;
         }
     }
-	for (size_t i = skip + 1; i < 		pos.size(); i++) {
-	     pos[i] = tsOrder.size() - pos.size() + i;
-}
+    for (size_t i = skip + 1; i < pos.size(); i++) {
+         pos[i] = tsOrder.size() - pos.size() + i;
+    }
 }
 \end{lstlisting}
 
@@ -1086,10 +1086,10 @@ void ForceSkipFast(const vector<size_t>& tsOrder,
         }
     }
     size_t skipPos = pos[skip];
-    }
     pos[0] = skipPos - 1;
     for (size_t i = 1; i < pos.size(); i++) {
-    pos[i] = tsOrder.size() - pos.size() + i;
+        pos[i] = tsOrder.size() - pos.size() + i;
+    }
 }
 \end{lstlisting}
 
